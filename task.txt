@@ -1,0 +1,42 @@
+
+### Project goal
+•	To create REST API service providing all available products of an eshop and enabling the partial update of one product
+•	To create swagger documentation all endpoints
+•	To create unit test covering the endpoints functionality
+•	We expect you to deliver the same quality of solution, as you would for any production−grade code
+•	Follow the best practices for REST API design
+•	Follow the best practices for application design and implementation, use proper layered architecture and apply SOLID design principles
+
+### Technical solution
+•	Use either free version of Visual Studio, or Visual Studio Code
+•	The solution shall be based on .NET Core framework (use the most recent LTS version) and C#
+
+
+### API Specification
+•	Resource describing a product with at least following attributes
+    o	Id (required)
+    o	Name (required)
+    o	ImgUri (required)
+    o	Price (required, decimal)
+    o	Description (optional)
+•	API endpoint to list all available products
+    o	Add v2 version of the endpoint with support for pagination (default page size 10). Use versioning method of your choice (make sure the versioning is properly reflected in the API documentation).
+•	API endpoint to retrieve one product by ID
+•	API endpoint to update product description
+
+
+### Data Layer
+•	Prepare simple SQL database for storing of the product data (MSSQL is preferred)
+•	Feel free to use ORM framework of your choice
+•	Prepare initial seed of the database
+•	Prepare mock data that can be used for unit tests
+•	It shall be easy to switch between the mock and DB data
+
+
+### Project Deliveries
+•	Link to public git repository (showing full commit history documenting your progress) with complete solution consisting at least of
+    o	The Web API project that can be directly compiled and executed in an IDE
+    o	Project with unit tests
+•	Complete API documentation accessible in browser after running the project on localhost (ƒswagger)
+•	README file in the repository describing at least basic information about the application, prerequisites for running of the project, steps how to run the application, information how to run the unit test
+
