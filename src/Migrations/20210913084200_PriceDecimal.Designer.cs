@@ -3,14 +3,16 @@ using API.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace API.Migrations
 {
     [DbContext(typeof(ProductsDbContext))]
-    partial class ProductsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210913084200_PriceDecimal")]
+    partial class PriceDecimal
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

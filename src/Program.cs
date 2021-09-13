@@ -16,7 +16,7 @@ namespace RetailerInterviewAPITask {
             if ( Environment.GetEnvironmentVariable( "ASPNETCORE_ENVIRONMENT" ) == Environments.Development ) {
                 hostBuilder
                     .MigrateDatabase()
-                    .SeedDatabaseIfEmpty();
+                    .SeedDatabaseIfEmpty(300);
             };
 
             hostBuilder.Run();
