@@ -42,11 +42,7 @@ namespace RetailerInterviewAPITask.Controllers {
         [Consumes("text/plain")]
         [Produces( "application/json" )]        
         [HttpPatch( "{id:int}/update-description" )]
-        public async Task<ActionResult<Product>> UpdateDescription( int id ,  string newDescription ) {
-
-            if ( newDescription ==null ) {
-                return BadRequest( "Missing DescriptionDto" );
-            }
+        public async Task<ActionResult<Product>> UpdateDescription( int id , [FromBody] string newDescription ) {
 
             var product = await _productsDbContext.Products.FindAsync( id );
 
@@ -55,6 +51,7 @@ namespace RetailerInterviewAPITask.Controllers {
 
             product.Description = newDescription;
 
+            //TODO check for concurrency error?
             await _productsDbContext.SaveChangesAsync();
 
             return Ok( product );

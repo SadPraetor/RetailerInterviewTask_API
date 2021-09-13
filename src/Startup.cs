@@ -1,4 +1,5 @@
 using API.DataAccess;
+using API.Utilities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -29,7 +30,7 @@ namespace RetailerInterviewAPITask {
                  options.UseSqlServer( Configuration.GetConnectionString( "ProductsDb" ) ) 
             );
 
-            services.AddControllers();
+            services.AddControllers(o=>o.InputFormatters.Insert(0,new RawRequestBodyFormatter()));
 
             services.AddSwaggerGen( c => {
                 c.SwaggerDoc( "v1", new OpenApiInfo { Title = "RetailerInterviewAPITask", Version = "v1" } );
