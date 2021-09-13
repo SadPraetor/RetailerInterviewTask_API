@@ -11,6 +11,8 @@ using System.Threading.Tasks;
 namespace RetailerInterviewAPITask.Controllers {
     [ApiController]
     [Route( "api/[controller]" )]
+    [ApiVersion( "1.0" )]
+    [ApiVersion( "2.0" )]
     public class ProductsController : ControllerBase {
         
 
@@ -22,12 +24,15 @@ namespace RetailerInterviewAPITask.Controllers {
             _productsDbContext = productsDbContext;
         }
 
+        [MapToApiVersion( "1.0" )]
         [Produces( "application/json" )]
         [HttpGet]
         public async Task<IEnumerable<Product>> GetAll() {
             return await _productsDbContext.Products.AsNoTracking().ToListAsync();
         }
 
+        [MapToApiVersion( "1.0" )]
+        [MapToApiVersion( "2.0" )]
         [Produces( "application/json" )]
         [HttpGet("{id:int}")]
         public async Task<ActionResult<Product>> GetById(int id) {
@@ -39,6 +44,9 @@ namespace RetailerInterviewAPITask.Controllers {
             return Ok( product );
         }
 
+
+        [MapToApiVersion( "1.0" )]
+        [MapToApiVersion( "2.0" )]
         [Consumes("text/plain")]
         [Produces( "application/json" )]        
         [HttpPatch( "{id:int}/update-description" )]
