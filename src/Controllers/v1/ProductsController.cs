@@ -13,7 +13,7 @@ namespace RetailerInterviewAPITask.Controllers {
     [Route( "api/[controller]" )]
     [ApiVersion( "1.0" )]
     [ApiVersion( "2.0" )]
-    public class ProductsController : ControllerBase {
+    public partial class ProductsController : ControllerBase {
         
 
         private readonly ILogger<ProductsController> _logger;
