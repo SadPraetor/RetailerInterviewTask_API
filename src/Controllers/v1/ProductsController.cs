@@ -51,7 +51,7 @@ namespace RetailerInterviewAPITask.Controllers {
         [Produces( "application/json" )]        
         [HttpPatch( "{id:int}/update-description" )]
         public async Task<ActionResult<Product>> UpdateDescription( int id , [FromBody] string newDescription ) {
-
+            //TODO limit to 4000
             var product = await _productsDbContext.Products.FindAsync( id );
 
             if ( product == null )

@@ -19,13 +19,14 @@ namespace RetailerInterviewAPITask.Controllers {
         [Produces( "application/json" )]
         [ProducesResponseType( StatusCodes.Status200OK, Type = typeof( Product ) )]
         [ProducesResponseType( StatusCodes.Status404NotFound, Type = typeof( ExceptionDto ) )]
+        [ProducesResponseType( StatusCodes.Status400BadRequest, Type = typeof( ExceptionDto ) )]
         [HttpGet]
         public async Task<ActionResult<PaginatedResponseModel<Product>>> GetAll20( 
             [FromQuery] PaginationQuery paginationQuery, CancellationToken cancellationToken ) 
         {
-            //TODO handle bad pagination query
-
+            
             try {
+                
                 var paginationFilter = new PaginationFilter( paginationQuery );
 
                 return Ok( await _productsDbContext
@@ -34,9 +35,11 @@ namespace RetailerInterviewAPITask.Controllers {
                     .PaginateAsync<Product>( paginationFilter.Page, paginationFilter.PageSize, cancellationToken ) );
 
             }
-            catch ( Exception exception ) {
-              
-                return NotFound( new ExceptionDto(exception) );
+            catch ( PageOutOfRangeException exception) {
+                return NotFound( new ExceptionDto( exception ) );
+            }
+            catch ( Exception exception ) {              
+                return BadRequest( new ExceptionDto(exception) );
             }
 
 
