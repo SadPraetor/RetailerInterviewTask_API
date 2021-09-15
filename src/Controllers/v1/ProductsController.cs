@@ -1,6 +1,7 @@
 ﻿using API.DataAccess;
 using API.Models;
 using API.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -31,17 +32,19 @@ namespace RetailerInterviewAPITask.Controllers {
             _uriGenerator = uriGenerator;
         }
 
+        [HttpGet]
         [MapToApiVersion( "1.0" )]
         [Produces( "application/json" )]
-        [HttpGet]
+        [ProducesResponseType( StatusCodes.Status200OK, Type = typeof( IEnumerable<Product> ) )]
         public async Task<IEnumerable<Product>> GetAllAsync() {
             return await _productsDbContext.Products.AsNoTracking().ToListAsync();
         }
 
+        [HttpGet("{id:int}")]
         [MapToApiVersion( "1.0" )]
         [MapToApiVersion( "2.0" )]
         [Produces( "application/json" )]
-        [HttpGet("{id:int}")]
+        [ProducesResponseType( StatusCodes.Status200OK, Type = typeof( Product ) )]
         public async Task<ActionResult<Product>> GetByIdAsync(int id) {
             var product =  await _productsDbContext.Products.FindAsync( id );
 
@@ -52,11 +55,12 @@ namespace RetailerInterviewAPITask.Controllers {
         }
 
 
+        [HttpPatch( "{id:int}/description" )]
         [MapToApiVersion( "1.0" )]
         [MapToApiVersion( "2.0" )]
         [Consumes("text/plain")]
-        [Produces( "application/json" )]        
-        [HttpPatch( "{id:int}/update-description" )]
+        [Produces( "application/json" )]
+        [ProducesResponseType( StatusCodes.Status200OK, Type = typeof( Product ) )]
         public async Task<ActionResult<Product>> UpdateDescriptionAsync( int id , [FromBody] string newDescription ) {
             //TODO limit to 4000
             var product = await _productsDbContext.Products.FindAsync( id );

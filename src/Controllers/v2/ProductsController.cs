@@ -17,7 +17,7 @@ namespace RetailerInterviewAPITask.Controllers {
 
         [MapToApiVersion( "2.0" )]
         [Produces( "application/json" )]
-        [ProducesResponseType( StatusCodes.Status200OK, Type = typeof( Product ) )]
+        [ProducesResponseType( StatusCodes.Status200OK, Type = typeof( PaginatedResponseModel<Product> ) )]
         [ProducesResponseType( StatusCodes.Status404NotFound, Type = typeof( ExceptionDto ) )]
         [ProducesResponseType( StatusCodes.Status400BadRequest, Type = typeof( ExceptionDto ) )]
         [HttpGet(Name =nameof(GetAllAsync20))]
@@ -26,7 +26,7 @@ namespace RetailerInterviewAPITask.Controllers {
         {
             
             try {
-                
+
                 var paginationFilter = new PaginationFilter( paginationQuery );
 
                 var paginatedModel =   await _productsDbContext
@@ -44,8 +44,11 @@ namespace RetailerInterviewAPITask.Controllers {
             catch ( PageOutOfRangeException exception) {
                 return NotFound( new ExceptionDto( exception ) );
             }
-            catch ( Exception exception ) {              
+            catch ( FaultyPaginationQuery exception ) {              
                 return BadRequest( new ExceptionDto(exception) );
+            }
+            catch(Exception exception ) {                
+                return StatusCode( StatusCodes.Status500InternalServerError,new ExceptionDto(exception) );
             }
 
 

@@ -3,7 +3,7 @@ using API.Services;
 using API.Utilities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Versioning;
@@ -11,15 +11,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.OpenApi.Models;
 using RetailerInterviewAPITask.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace RetailerInterviewAPITask {
     public class Startup {
@@ -36,7 +30,8 @@ namespace RetailerInterviewAPITask {
                  options.UseSqlServer( Configuration.GetConnectionString( "ProductsDb" ) ) 
             );
 
-            services.AddControllers(o=>o.InputFormatters.Insert(0,new RawRequestBodyFormatter()));
+            services.AddControllers( options => options.InputFormatters.Insert( 0, new RawRequestBodyFormatter() ) );
+               
 
             services.AddApiVersioning( options => {
                 options.AssumeDefaultVersionWhenUnspecified = true;
@@ -56,7 +51,16 @@ namespace RetailerInterviewAPITask {
             services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
             services.AddSwaggerGen( options => options.OperationFilter<SwaggerDefaultValues>() );
 
-            services.AddSingleton<IUriGenerator,UriGenerator>();
+
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
+            //might need to be adjusted in scenario of proxy (X-Forwarded-For, X-Forwarded-Path)
+            services.AddSingleton<IUriGenerator,UriGenerator>(provider => {
+                var accessor = provider.GetRequiredService<IHttpContextAccessor>();
+                var request = accessor.HttpContext.Request;
+                var absoluteUri = $"{request.Scheme}://{request.Host.ToUriComponent()}";
+                return new UriGenerator( absoluteUri );
+            } );
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
