@@ -4,15 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace API.Models {
-    public class PaginationQuery {
-        private int pageSize =10;
-
-        public int PageSize {
-            get => pageSize;
-            set  {
-                pageSize = value >100 ? 100 : value;
-            } }
-        public int Page { get; set; } = 1;
-
+    public class PaginationQuery {      
+        public int PageSize {get; set;}
+        public int Page { get; set; } 
     }
 }
