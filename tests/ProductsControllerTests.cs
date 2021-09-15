@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using RetailerInterviewAPITask.Controllers;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -109,6 +110,29 @@ namespace RetailApiTestProject {
             var result = await controller.UpdateDescriptionAsync( _productsSeed.Count , "test", new CancellationToken() );
 
             Assert.IsType<OkObjectResult>( result.Result );
+
+        }
+
+        [Fact]
+        public async Task UpdateDescription_ShouldReturnBadRequestObjectResult() {
+
+            var lengthLimit = typeof( Product )
+               .GetProperty( nameof( Product.Description ) )
+               .GetCustomAttributes( typeof( StringLengthAttribute ), false )
+               .OfType<StringLengthAttribute>()
+               .FirstOrDefault()?
+               .MaximumLength;
+
+            Assert.NotNull( lengthLimit );
+
+            var productsDbcontext = SetupInMemoryDbContext.GetProductsDbContext( nameof( this.UpdateDescription_ShouldReturnBadRequestObjectResult ) );
+            productsDbcontext.SeedAppDbContext( _productsSeed );
+
+            var controller = new ProductsController( null, productsDbcontext, null );
+
+            var result = await controller.UpdateDescriptionAsync( _productsSeed.Count, new string('a',lengthLimit.Value+5), new CancellationToken() );
+
+            Assert.IsType<BadRequestObjectResult>( result.Result );
 
         }
 

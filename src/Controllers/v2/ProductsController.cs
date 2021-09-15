@@ -38,6 +38,7 @@ namespace RetailerInterviewAPITask.Controllers {
                 var paginatedModel =   await _productsDbContext
                     .Products
                     .AsNoTracking()
+                    .OrderBy(x=>x.Id)
                     .PaginateAsync<Product>( paginationFilter.Page, paginationFilter.PageSize, cancellationToken ) ;
 
                 var path = Url.RouteUrl( nameof( GetAllAsync20 ) );
