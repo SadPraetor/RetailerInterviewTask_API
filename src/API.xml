@@ -4,13 +4,13 @@
         <name>API</name>
     </assembly>
     <members>
-        <member name="M:RetailerInterviewAPITask.Controllers.ProductsController.GetAllAsync">
+        <member name="M:RetailerInterviewAPITask.Controllers.ProductsController.GetAllAsync(System.Threading.CancellationToken)">
             <summary>
             Returns list of products
             </summary>                
             <response code="200">Products found and returned</response>                   
         </member>
-        <member name="M:RetailerInterviewAPITask.Controllers.ProductsController.GetByIdAsync(System.Int32)">
+        <member name="M:RetailerInterviewAPITask.Controllers.ProductsController.GetByIdAsync(System.Int32,System.Threading.CancellationToken)">
             <summary>
             Returns specific requested product, by Id
             </summary>                
@@ -18,7 +18,7 @@
             <response code="200">Product found and returned</response>  
             <response code="404">Requested product was not found</response> 
         </member>
-        <member name="M:RetailerInterviewAPITask.Controllers.ProductsController.UpdateDescriptionAsync(System.Int32,System.String)">
+        <member name="M:RetailerInterviewAPITask.Controllers.ProductsController.UpdateDescriptionAsync(System.Int32,System.String,System.Threading.CancellationToken)">
             <summary>
             Updates description on specific product, identified by Id
             </summary>               

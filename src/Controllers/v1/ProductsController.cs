@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
+using System.Threading;
 
 namespace RetailerInterviewAPITask.Controllers {
     [ApiController]
@@ -42,8 +43,8 @@ namespace RetailerInterviewAPITask.Controllers {
         [MapToApiVersion( "1.0" )]
         [Produces( "application/json" )]
         [ProducesResponseType( StatusCodes.Status200OK, Type = typeof( IEnumerable<Product> ) )]
-        public async Task<IEnumerable<Product>> GetAllAsync() {
-            return await _productsDbContext.Products.AsNoTracking().ToListAsync();
+        public async Task<IEnumerable<Product>> GetAllAsync( CancellationToken cancellationToken ) {
+            return await _productsDbContext.Products.AsNoTracking().ToListAsync( cancellationToken );
         }
 
 
@@ -59,8 +60,9 @@ namespace RetailerInterviewAPITask.Controllers {
         [Produces( "application/json" )]
         [ProducesResponseType( StatusCodes.Status200OK, Type = typeof( Product ) )]
         [ProducesResponseType( StatusCodes.Status404NotFound, Type = typeof( ExceptionDto ) )]
-        public async Task<ActionResult<Product>> GetByIdAsync(int id) {
-            var product =  await _productsDbContext.Products.FindAsync( id );
+        public async Task<ActionResult<Product>> GetByIdAsync(int id, CancellationToken cancellationToken ) {
+
+            var product =  await _productsDbContext.Products.FindAsync(new object[] { id }, cancellationToken );
 
             if ( product == null )
                 return NotFound(new ExceptionDto ("NotFound","Requested product was not found"));
@@ -83,7 +85,7 @@ namespace RetailerInterviewAPITask.Controllers {
         [Produces( "application/json" )]
         [ProducesResponseType( StatusCodes.Status200OK, Type = typeof( Product ) )]
         [ProducesResponseType( StatusCodes.Status404NotFound, Type = typeof( ExceptionDto ) )]
-        public async Task<ActionResult<Product>> UpdateDescriptionAsync( int id , [FromBody] string newDescription ) {
+        public async Task<ActionResult<Product>> UpdateDescriptionAsync( int id , [FromBody] string newDescription, CancellationToken cancellationToken ) {
 
             var lengthLimit =  typeof( Product )
                 .GetProperty( nameof( Product.Description ) )
@@ -96,7 +98,7 @@ namespace RetailerInterviewAPITask.Controllers {
                 return BadRequest( new ExceptionDto( "DescriptionTooLong", $"Description is limited to {lengthLimit} characters" ) );
             }
 
-            var product = await _productsDbContext.Products.FindAsync( id );
+            var product = await _productsDbContext.Products.FindAsync( new object[] { id }, cancellationToken );
 
             if ( product == null )
                 return NotFound( new ExceptionDto( "NotFound", "Requested product was not found" ) );
