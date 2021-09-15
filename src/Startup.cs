@@ -14,6 +14,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using RetailerInterviewAPITask.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using System.IO;
 
 namespace RetailerInterviewAPITask {
     public class Startup {
@@ -49,7 +50,12 @@ namespace RetailerInterviewAPITask {
 
             } );
             services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
-            services.AddSwaggerGen( options => options.OperationFilter<SwaggerDefaultValues>() );
+            services.AddSwaggerGen( options => {
+                options.OperationFilter<SwaggerDefaultValues>();
+                var filePath = Path.Combine( System.AppContext.BaseDirectory, "Api.xml" );
+                options.IncludeXmlComments( filePath );
+            } 
+            );
 
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();

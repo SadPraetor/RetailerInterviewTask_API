@@ -15,6 +15,12 @@ namespace RetailerInterviewAPITask.Controllers {
    
     public partial class ProductsController : ControllerBase {
 
+        /// <summary>
+        /// Returns paginated model with list of products as member
+        /// </summary>
+        /// <response code="200">Products found and returned</response> 
+        /// <response code="400">Bad Request, most likely wrong pagination query</response>
+        /// <response code="404">Requested page not found</response>
         [HttpGet(Name =nameof(GetAllAsync20))]
         [MapToApiVersion( "2.0" )]
         [Produces( "application/json" )]
