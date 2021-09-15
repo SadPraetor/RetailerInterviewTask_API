@@ -1,5 +1,6 @@
 ﻿using API.DataAccess;
 using API.Models;
+using API.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -18,16 +19,22 @@ namespace RetailerInterviewAPITask.Controllers {
 
         private readonly ILogger<ProductsController> _logger;
         private readonly ProductsDbContext _productsDbContext;
+        private readonly IUriGenerator _uriGenerator;
 
-        public ProductsController( ILogger<ProductsController> logger,ProductsDbContext productsDbContext ) {
+        public ProductsController( 
+            ILogger<ProductsController> logger,
+            ProductsDbContext productsDbContext,
+            IUriGenerator uriGenerator) 
+        {
             _logger = logger;
             _productsDbContext = productsDbContext;
+            _uriGenerator = uriGenerator;
         }
 
         [MapToApiVersion( "1.0" )]
         [Produces( "application/json" )]
         [HttpGet]
-        public async Task<IEnumerable<Product>> GetAll() {
+        public async Task<IEnumerable<Product>> GetAllAsync() {
             return await _productsDbContext.Products.AsNoTracking().ToListAsync();
         }
 
@@ -35,7 +42,7 @@ namespace RetailerInterviewAPITask.Controllers {
         [MapToApiVersion( "2.0" )]
         [Produces( "application/json" )]
         [HttpGet("{id:int}")]
-        public async Task<ActionResult<Product>> GetById(int id) {
+        public async Task<ActionResult<Product>> GetByIdAsync(int id) {
             var product =  await _productsDbContext.Products.FindAsync( id );
 
             if ( product == null )
@@ -50,7 +57,7 @@ namespace RetailerInterviewAPITask.Controllers {
         [Consumes("text/plain")]
         [Produces( "application/json" )]        
         [HttpPatch( "{id:int}/update-description" )]
-        public async Task<ActionResult<Product>> UpdateDescription( int id , [FromBody] string newDescription ) {
+        public async Task<ActionResult<Product>> UpdateDescriptionAsync( int id , [FromBody] string newDescription ) {
             //TODO limit to 4000
             var product = await _productsDbContext.Products.FindAsync( id );
 

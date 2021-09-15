@@ -26,9 +26,9 @@ namespace RetailApiTestProject {
             var productsDbcontext = SetupInMemoryDbContext.GetProductsDbContext( nameof(this.GetAll_ShouldReturnAllProducts) );
             productsDbcontext.SeedAppDbContext( _productsSeed );
 
-            var controller = new ProductsController( null, productsDbcontext );
+            var controller = new ProductsController( null, productsDbcontext, null );
 
-            var result = await controller.GetAll();
+            var result = await controller.GetAllAsync();
 
             Assert.Equal( _productsSeed.Count(), result.Count() );
 
@@ -40,9 +40,9 @@ namespace RetailApiTestProject {
             var productsDbcontext = SetupInMemoryDbContext.GetProductsDbContext( nameof( this.GetById_ShouldReturnOkResult ) );
             productsDbcontext.SeedAppDbContext( _productsSeed );
 
-            var controller = new ProductsController( null, productsDbcontext );
+            var controller = new ProductsController( null, productsDbcontext, null );
 
-            var result = await controller.GetById(_productsSeed.Count);
+            var result = await controller.GetByIdAsync(_productsSeed.Count);
 
             Assert.IsType<OkObjectResult>( result.Result );
 
@@ -54,9 +54,9 @@ namespace RetailApiTestProject {
             var productsDbcontext = SetupInMemoryDbContext.GetProductsDbContext( nameof( this.GetById_ShouldReturnNotFound) );
             productsDbcontext.SeedAppDbContext( _productsSeed );
 
-            var controller = new ProductsController( null, productsDbcontext );
+            var controller = new ProductsController( null, productsDbcontext, null );
 
-            var result = await controller.GetById( _productsSeed.Count+5 );
+            var result = await controller.GetByIdAsync( _productsSeed.Count+5 );
 
             Assert.IsType<NotFoundResult>( result.Result );
 
@@ -68,9 +68,9 @@ namespace RetailApiTestProject {
             var productsDbcontext = SetupInMemoryDbContext.GetProductsDbContext( nameof( this.GetById_ShouldReturnCorrespondingProduct ) );
             productsDbcontext.SeedAppDbContext( _productsSeed );
 
-            var controller = new ProductsController( null, productsDbcontext );
+            var controller = new ProductsController( null, productsDbcontext,null );
 
-            var result = await controller.GetById( _productsSeed.Count );
+            var result = await controller.GetByIdAsync( _productsSeed.Count );
 
             Assert.IsType<OkObjectResult>( result.Result );
             Assert.NotNull( result.Result );
@@ -88,9 +88,9 @@ namespace RetailApiTestProject {
             var productsDbcontext = SetupInMemoryDbContext.GetProductsDbContext( nameof( this.UpdateDescription_ShouldReturnNotFound ) );
             productsDbcontext.SeedAppDbContext( _productsSeed );
 
-            var controller = new ProductsController( null, productsDbcontext );
+            var controller = new ProductsController( null, productsDbcontext, null );
 
-            var result = await controller.UpdateDescription( _productsSeed.Count +5, "test" );
+            var result = await controller.UpdateDescriptionAsync( _productsSeed.Count +5, "test" );
 
             Assert.IsType<NotFoundResult>( result.Result );
 
@@ -102,9 +102,9 @@ namespace RetailApiTestProject {
             var productsDbcontext = SetupInMemoryDbContext.GetProductsDbContext( nameof( this.UpdateDescription_ShouldReturnOk ) );
             productsDbcontext.SeedAppDbContext( _productsSeed );
 
-            var controller = new ProductsController( null, productsDbcontext );
+            var controller = new ProductsController( null, productsDbcontext , null);
 
-            var result = await controller.UpdateDescription( _productsSeed.Count , "test" );
+            var result = await controller.UpdateDescriptionAsync( _productsSeed.Count , "test" );
 
             Assert.IsType<OkObjectResult>( result.Result );
 
@@ -118,9 +118,9 @@ namespace RetailApiTestProject {
 
             var guid = Guid.NewGuid();
 
-            var controller = new ProductsController( null, productsDbcontext );
+            var controller = new ProductsController( null, productsDbcontext, null );
 
-            var result = await controller.UpdateDescription( _productsSeed.Count, guid.ToString() );
+            var result = await controller.UpdateDescriptionAsync( _productsSeed.Count, guid.ToString() );
 
 
             Assert.IsType<OkObjectResult>( result.Result );

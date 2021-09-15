@@ -20,8 +20,8 @@ namespace RetailerInterviewAPITask.Controllers {
         [ProducesResponseType( StatusCodes.Status200OK, Type = typeof( Product ) )]
         [ProducesResponseType( StatusCodes.Status404NotFound, Type = typeof( ExceptionDto ) )]
         [ProducesResponseType( StatusCodes.Status400BadRequest, Type = typeof( ExceptionDto ) )]
-        [HttpGet]
-        public async Task<ActionResult<PaginatedResponseModel<Product>>> GetAll20( 
+        [HttpGet(Name =nameof(GetAllAsync20))]
+        public async Task<ActionResult<PaginatedResponseModel<Product>>> GetAllAsync20( 
             [FromQuery] PaginationQuery paginationQuery, CancellationToken cancellationToken ) 
         {
             
@@ -29,10 +29,16 @@ namespace RetailerInterviewAPITask.Controllers {
                 
                 var paginationFilter = new PaginationFilter( paginationQuery );
 
-                return Ok( await _productsDbContext
+                var paginatedModel =   await _productsDbContext
                     .Products
                     .AsNoTracking()
-                    .PaginateAsync<Product>( paginationFilter.Page, paginationFilter.PageSize, cancellationToken ) );
+                    .PaginateAsync<Product>( paginationFilter.Page, paginationFilter.PageSize, cancellationToken ) ;
+
+                var path = Url.RouteUrl( nameof( GetAllAsync20 ) );
+
+                paginatedModel.Links = _uriGenerator.GeneratePaginationLinks<Product>(paginatedModel, path );
+
+                return Ok(paginatedModel);
 
             }
             catch ( PageOutOfRangeException exception) {

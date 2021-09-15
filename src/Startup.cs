@@ -1,4 +1,5 @@
 using API.DataAccess;
+using API.Services;
 using API.Utilities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -54,6 +55,8 @@ namespace RetailerInterviewAPITask {
             } );
             services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
             services.AddSwaggerGen( options => options.OperationFilter<SwaggerDefaultValues>() );
+
+            services.AddSingleton<IUriGenerator,UriGenerator>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

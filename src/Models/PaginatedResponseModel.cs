@@ -15,6 +15,9 @@ namespace API.Models {
         public int CurrentPage { get; set; }
         public int TotalItems { get; set; }
         public int TotalPages { get; set; }
+
+        public IDictionary<string, string> Links { get; set; }
+
         public IList<T> Data { get; set; }
 
         public PaginatedResponseModel() {
