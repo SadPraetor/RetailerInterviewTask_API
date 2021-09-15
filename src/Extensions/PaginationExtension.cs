@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Microsoft.EntityFrameworkCore {
+namespace System.Linq {
     public static class PaginationExtension {
         public static async Task<PaginatedResponseModel<TModel>> PaginateAsync<TModel>(
                 this IQueryable<TModel> query,

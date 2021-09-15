@@ -44,7 +44,7 @@ namespace RetailerInterviewAPITask.Controllers {
             catch ( PageOutOfRangeException exception) {
                 return NotFound( new ExceptionDto( exception ) );
             }
-            catch ( FaultyPaginationQuery exception ) {              
+            catch ( FaultyPaginationQueryException exception ) {              
                 return BadRequest( new ExceptionDto(exception) );
             }
             catch(Exception exception ) {                

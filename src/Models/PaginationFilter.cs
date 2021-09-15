@@ -12,22 +12,24 @@ namespace API.Models {
             PageSize = 10;
             Page = 1;
         }
+        public PaginationFilter(int pageSize, int page) {
 
-        public PaginationFilter(PaginationQuery paginationQuery) {
+            if ( page < 1 ) {
+                throw new FaultyPaginationQueryException( "Page number must be greater than 0" );
+            }
+
+            if ( pageSize < 1 ) {
+                throw new FaultyPaginationQueryException( "Page size must be greater than 0" );
+            }
+
+            PageSize =pageSize > 100 ? 100 : pageSize;
+            Page = page;
+        }
+
+        public PaginationFilter(PaginationQuery paginationQuery) : this( paginationQuery.PageSize, paginationQuery.Page ) {
             if ( paginationQuery == null ) {
                 new PaginationFilter();
-            }
-
-            if ( paginationQuery.Page <1 ) {
-                throw new FaultyPaginationQuery( "Page number must be greater than 0" );
-            }
-
-            if ( paginationQuery.PageSize <1 ) {
-                throw new FaultyPaginationQuery( "Page size must be greater than 0" );
-            }
-
-            PageSize = paginationQuery.PageSize > 100 ? 100 : paginationQuery.PageSize; 
-            Page = paginationQuery.Page;
+            }            
         }
 
 
