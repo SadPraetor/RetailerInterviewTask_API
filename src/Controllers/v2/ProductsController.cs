@@ -15,12 +15,12 @@ namespace RetailerInterviewAPITask.Controllers {
    
     public partial class ProductsController : ControllerBase {
 
+        [HttpGet(Name =nameof(GetAllAsync20))]
         [MapToApiVersion( "2.0" )]
         [Produces( "application/json" )]
         [ProducesResponseType( StatusCodes.Status200OK, Type = typeof( PaginatedResponseModel<Product> ) )]
         [ProducesResponseType( StatusCodes.Status404NotFound, Type = typeof( ExceptionDto ) )]
         [ProducesResponseType( StatusCodes.Status400BadRequest, Type = typeof( ExceptionDto ) )]
-        [HttpGet(Name =nameof(GetAllAsync20))]
         public async Task<ActionResult<PaginatedResponseModel<Product>>> GetAllAsync20( 
             [FromQuery] PaginationQuery paginationQuery, CancellationToken cancellationToken ) 
         {

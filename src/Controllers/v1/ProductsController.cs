@@ -45,11 +45,12 @@ namespace RetailerInterviewAPITask.Controllers {
         [MapToApiVersion( "2.0" )]
         [Produces( "application/json" )]
         [ProducesResponseType( StatusCodes.Status200OK, Type = typeof( Product ) )]
+        [ProducesResponseType( StatusCodes.Status404NotFound, Type = typeof( ExceptionDto ) )]
         public async Task<ActionResult<Product>> GetByIdAsync(int id) {
             var product =  await _productsDbContext.Products.FindAsync( id );
 
             if ( product == null )
-                return NotFound();
+                return NotFound(new ExceptionDto ("NotFound","Requested product was not found"));
 
             return Ok( product );
         }
@@ -61,12 +62,13 @@ namespace RetailerInterviewAPITask.Controllers {
         [Consumes("text/plain")]
         [Produces( "application/json" )]
         [ProducesResponseType( StatusCodes.Status200OK, Type = typeof( Product ) )]
+        [ProducesResponseType( StatusCodes.Status404NotFound, Type = typeof( ExceptionDto ) )]
         public async Task<ActionResult<Product>> UpdateDescriptionAsync( int id , [FromBody] string newDescription ) {
             //TODO limit to 4000
             var product = await _productsDbContext.Products.FindAsync( id );
 
             if ( product == null )
-                return NotFound();
+                return NotFound( new ExceptionDto( "NotFound", "Requested product was not found" ) );
 
             product.Description = newDescription;
 
