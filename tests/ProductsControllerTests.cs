@@ -49,16 +49,16 @@ namespace RetailApiTestProject {
         }
 
         [Fact]
-        public async Task GetById_ShouldReturnNotFound() {
+        public async Task GetById_ShouldReturnNotFoundObjectResult() {
 
-            var productsDbcontext = SetupInMemoryDbContext.GetProductsDbContext( nameof( this.GetById_ShouldReturnNotFound) );
+            var productsDbcontext = SetupInMemoryDbContext.GetProductsDbContext( nameof( this.GetById_ShouldReturnNotFoundObjectResult) );
             productsDbcontext.SeedAppDbContext( _productsSeed );
 
             var controller = new ProductsController( null, productsDbcontext, null );
 
             var result = await controller.GetByIdAsync( _productsSeed.Count+5 );
 
-            Assert.IsType<NotFoundResult>( result.Result );
+            Assert.IsType<NotFoundObjectResult>( result.Result );
 
         }
 
@@ -83,16 +83,16 @@ namespace RetailApiTestProject {
         }
 
         [Fact]
-        public async Task UpdateDescription_ShouldReturnNotFound() {
+        public async Task UpdateDescription_ShouldReturnNotFoundObjectResult() {
 
-            var productsDbcontext = SetupInMemoryDbContext.GetProductsDbContext( nameof( this.UpdateDescription_ShouldReturnNotFound ) );
+            var productsDbcontext = SetupInMemoryDbContext.GetProductsDbContext( nameof( this.UpdateDescription_ShouldReturnNotFoundObjectResult ) );
             productsDbcontext.SeedAppDbContext( _productsSeed );
 
             var controller = new ProductsController( null, productsDbcontext, null );
 
             var result = await controller.UpdateDescriptionAsync( _productsSeed.Count +5, "test" );
 
-            Assert.IsType<NotFoundResult>( result.Result );
+            Assert.IsType<NotFoundObjectResult>( result.Result );
 
         }
 
