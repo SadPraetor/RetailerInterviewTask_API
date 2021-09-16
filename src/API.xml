@@ -25,6 +25,7 @@
             <param name="id">Id of the product</param> 
             <param name="newDescription">Text/Plain new description. Limit 4000 characters</param> 
             <response code="200">Product found and description updated</response>  
+            <response code="404">New description is too long</response> 
             <response code="404">Product not found</response> 
         </member>
         <member name="M:RetailerInterviewAPITask.Controllers.ProductsController.GetAllAsync20(API.Models.PaginationQuery,System.Threading.CancellationToken)">
