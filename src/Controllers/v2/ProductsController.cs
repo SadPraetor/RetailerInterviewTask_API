@@ -57,9 +57,6 @@ namespace RetailerInterviewAPITask.Controllers {
             catch(Exception exception ) {                
                 return StatusCode( StatusCodes.Status500InternalServerError,new ExceptionDto(exception) );
             }
-
-
-        }
-       
+        }       
     }
 }
