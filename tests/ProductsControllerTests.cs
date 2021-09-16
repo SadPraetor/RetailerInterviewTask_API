@@ -28,6 +28,23 @@ namespace RetailApiTestProject {
             
         }
 
+        private static ActionContext GetActionContextForPage( string page ) {
+            return new ActionContext() {
+                ActionDescriptor = new ActionDescriptor() {
+                    RouteValues = new Dictionary<string, string>
+                    {
+                { "page", page },
+            }
+                },
+                RouteData = new RouteData() {
+                    Values =
+                    {
+                [ "page" ] = page
+            }
+                }
+            };
+        }
+
         [Fact]
         public async Task GetAll_ShouldReturnAllProducts() {
 
@@ -170,6 +187,7 @@ namespace RetailApiTestProject {
         [Fact]
         public async Task GetAll20_ShouldReturnOkObject() {
 
+            //Arrange
             var productsDbcontext = SetupInMemoryDbContext.GetProductsDbContext( nameof( this.GetAll20_ShouldReturnOkObject ) );
             productsDbcontext.SeedAppDbContext( _productsSeed );
 
@@ -181,41 +199,96 @@ namespace RetailApiTestProject {
             .Returns( new Dictionary<string, string> { { "Next", "xyz" } } );
 
             var urlHelperMock = new Mock<IUrlHelper>();
-            urlHelperMock.SetupGet( h => h.ActionContext )
+            urlHelperMock.SetupGet( x => x.ActionContext )
                 .Returns( context );
 
-            urlHelperMock.Setup( h => h.RouteUrl( It.IsAny<UrlRouteContext>() ) )
+            urlHelperMock.Setup( x => x.RouteUrl( It.IsAny<UrlRouteContext>() ) )
                 .Returns( "api/products" );
 
-            var ctx = new DefaultHttpContext();            
-            var controller = new ProductsController( null, productsDbcontext, uriGeneratorMock.Object );
-            controller.ControllerContext = new ControllerContext() { HttpContext = ctx };
-            controller.Url = urlHelperMock.Object;
+            var ctx = new DefaultHttpContext();   
+            
+            var controller_sut = new ProductsController( null, productsDbcontext, uriGeneratorMock.Object );
+            controller_sut.ControllerContext = new ControllerContext() { HttpContext = ctx };
+            controller_sut.Url = urlHelperMock.Object;
 
-            var response = await controller.GetAllAsync20( new PaginationQuery() , new CancellationToken());
+            //Act
+            var response = await controller_sut.GetAllAsync20( new PaginationQuery() , new CancellationToken());
 
+            //Assert
             Assert.IsType<OkObjectResult>( response.Result );
 
         }
 
+        [Fact]
+        public async Task GetAll20_ShouldReturnNotFoundObjectResult() {
 
-        private static ActionContext GetActionContextForPage( string page ) {
-            return new ActionContext() {
-                ActionDescriptor = new ActionDescriptor() {
-                    RouteValues = new Dictionary<string, string>
-                    {
-                { "page", page },
-            }
-                },
-                RouteData = new RouteData() {
-                    Values =
-                    {
-                [ "page" ] = page
-            }
-                }
-            };
+            //Arrange
+            var productsDbcontext = SetupInMemoryDbContext.GetProductsDbContext( nameof( this.GetAll20_ShouldReturnNotFoundObjectResult ) );
+            productsDbcontext.SeedAppDbContext( _productsSeed );
+
+            var context = GetActionContextForPage( "/api/products" );
+
+            var uriGeneratorMock = new Mock<IUriGenerator>();
+            uriGeneratorMock.Setup( x =>
+             x.GeneratePaginationLinks( It.IsAny<PaginatedResponseModel<Product>>(), It.IsAny<string>() ) )
+            .Returns( new Dictionary<string, string> { { "Next", "xyz" } } );
+
+            var urlHelperMock = new Mock<IUrlHelper>();
+            urlHelperMock.SetupGet( x => x.ActionContext )
+                .Returns( context );
+
+            urlHelperMock.Setup( x => x.RouteUrl( It.IsAny<UrlRouteContext>() ) )
+                .Returns( "api/products" );
+
+            var ctx = new DefaultHttpContext();
+
+            var controller_sut = new ProductsController( null, productsDbcontext, uriGeneratorMock.Object );
+            controller_sut.ControllerContext = new ControllerContext() { HttpContext = ctx };
+            controller_sut.Url = urlHelperMock.Object;
+
+
+            //Act
+            var response = await controller_sut.GetAllAsync20( new PaginationQuery(10,20), new CancellationToken() );
+
+            //Assert
+            Assert.IsType<NotFoundObjectResult>( response.Result );
+
         }
 
+        [Fact]
+        public async Task GetAll20_ShouldReturnBadRequestObjectResult() {
 
+            //Arrange
+            var productsDbcontext = SetupInMemoryDbContext.GetProductsDbContext( nameof( this.GetAll20_ShouldReturnBadRequestObjectResult ) );
+            productsDbcontext.SeedAppDbContext( _productsSeed );
+
+            var context = GetActionContextForPage( "/api/products" );
+
+            var uriGeneratorMock = new Mock<IUriGenerator>();
+            uriGeneratorMock.Setup( x =>
+             x.GeneratePaginationLinks( It.IsAny<PaginatedResponseModel<Product>>(), It.IsAny<string>() ) )
+            .Returns( new Dictionary<string, string> { { "Next", "xyz" } } );
+
+            var urlHelperMock = new Mock<IUrlHelper>();
+            urlHelperMock.SetupGet( x => x.ActionContext )
+                .Returns( context );
+
+            urlHelperMock.Setup( x => x.RouteUrl( It.IsAny<UrlRouteContext>() ) )
+                .Returns( "api/products" );
+
+            var ctx = new DefaultHttpContext();
+
+            var controller_sut = new ProductsController( null, productsDbcontext, uriGeneratorMock.Object );
+            controller_sut.ControllerContext = new ControllerContext() { HttpContext = ctx };
+            controller_sut.Url = urlHelperMock.Object;
+
+
+            //Act
+            var response = await controller_sut.GetAllAsync20( new PaginationQuery( 10, -20 ), new CancellationToken() );
+
+            //Assert
+            Assert.IsType<BadRequestObjectResult>( response.Result );
+
+        }
     }
 }

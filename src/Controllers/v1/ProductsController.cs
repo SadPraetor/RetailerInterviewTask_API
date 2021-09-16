@@ -13,27 +13,9 @@ using System.ComponentModel.DataAnnotations;
 using System.Threading;
 
 namespace RetailerInterviewAPITask.Controllers {
-    [ApiController]
-    [Route( "api/[controller]" )]
-    [ApiVersion( "1.0" )]
-    [ApiVersion( "2.0" )]
+   
     public partial class ProductsController : ControllerBase {
         
-
-        private readonly ILogger<ProductsController> _logger;
-        private readonly ProductsDbContext _productsDbContext;
-        private readonly IUriGenerator _uriGenerator;
-
-        public ProductsController( 
-            ILogger<ProductsController> logger,
-            ProductsDbContext productsDbContext,
-            IUriGenerator uriGenerator) 
-        {
-            _logger = logger;
-            _productsDbContext = productsDbContext;
-            _uriGenerator = uriGenerator;
-        }
-
 
         /// <summary>
         /// Returns list of products
@@ -77,6 +59,7 @@ namespace RetailerInterviewAPITask.Controllers {
         /// <param name="id">Id of the product</param> 
         /// <param name="newDescription">Text/Plain new description. Limit 4000 characters</param> 
         /// <response code="200">Product found and description updated</response>  
+        /// <response code="404">New description is too long</response> 
         /// <response code="404">Product not found</response> 
         [HttpPatch( "{id:int}/description" )]
         [MapToApiVersion( "1.0" )]
@@ -84,6 +67,7 @@ namespace RetailerInterviewAPITask.Controllers {
         [Consumes("text/plain")]
         [Produces( "application/json" )]
         [ProducesResponseType( StatusCodes.Status200OK, Type = typeof( Product ) )]
+        [ProducesResponseType( StatusCodes.Status400BadRequest, Type = typeof( ExceptionDto ) )]
         [ProducesResponseType( StatusCodes.Status404NotFound, Type = typeof( ExceptionDto ) )]
         public async Task<ActionResult<Product>> UpdateDescriptionAsync( int id , [FromBody] string newDescription, CancellationToken cancellationToken ) {
 

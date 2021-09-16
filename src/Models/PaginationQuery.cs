@@ -14,5 +14,15 @@ namespace API.Models {
         /// Requested page 
         /// </summary>  
         public int Page { get; set; } = 1;
+
+        public PaginationQuery(int pageSize , int page) {
+            PageSize = pageSize;
+            Page = page;
+        }
+
+        public PaginationQuery() {
+
+        }
+        
     }
 }
