@@ -3,7 +3,7 @@ using System.Runtime.Serialization;
 
 namespace API.Models {
     [Serializable]
-    internal class PageOutOfRangeException : Exception {
+    public class PageOutOfRangeException : Exception {
         public PageOutOfRangeException() :base("Requested page is out of range"){
         }
 

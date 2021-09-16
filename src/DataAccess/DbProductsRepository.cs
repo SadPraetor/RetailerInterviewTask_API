@@ -34,7 +34,7 @@ namespace API.DataAccess {
             var lengthLimit = _descriptionMaxLength;
 
             if ( newDescription.Length > lengthLimit ) {
-                throw new DescriptionTooLongException();
+                throw new DescriptionTooLongException(lengthLimit);
             }
 
             var product = await GetByIdAsync(  id , cancellationToken );

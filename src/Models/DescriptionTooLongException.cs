@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace API.DataAccess {
+namespace API.Models {
     [Serializable]
-    internal class DescriptionTooLongException : Exception {
+    public class DescriptionTooLongException : Exception {
         public DescriptionTooLongException() {
         }
 

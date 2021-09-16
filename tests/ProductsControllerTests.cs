@@ -48,12 +48,12 @@ namespace RetailApiTestProject {
         [Fact]
         public async Task GetAll_ShouldReturnAllProducts() {
 
-            var productsDbcontext = SetupInMemoryDbContext.GetProductsDbContext( nameof(this.GetAll_ShouldReturnAllProducts) );
-            productsDbcontext.SeedAppDbContext( _productsSeed );
+            var productsRepositoryMock = new Mock<IProductsRepository>();
+            productsRepositoryMock.Setup( x => x.GetAllAsync( new CancellationToken() ) ).Returns(Task.FromResult( _productsSeed.AsEnumerable() ));
 
-            var controller = new ProductsController( null, productsDbcontext, null );
+            var controller_sut = new ProductsController( null, productsRepositoryMock.Object, null );
 
-            var result = await controller.GetAllAsync(new CancellationToken());
+            var result = await controller_sut.GetAllAsync(new CancellationToken());
 
             Assert.Equal( _productsSeed.Count(), result.Count() );
 
@@ -62,12 +62,12 @@ namespace RetailApiTestProject {
         [Fact]
         public async Task GetById_ShouldReturnOkResult() {
 
-            var productsDbcontext = SetupInMemoryDbContext.GetProductsDbContext( nameof( this.GetById_ShouldReturnOkResult ) );
-            productsDbcontext.SeedAppDbContext( _productsSeed );
+            var productsRepositoryMock = new Mock<IProductsRepository>();
+            productsRepositoryMock.Setup( x => x.GetByIdAsync(It.IsAny<int>(), new CancellationToken() ) ).Returns( Task.FromResult( _productsSeed.First() ) );
 
-            var controller = new ProductsController( null, productsDbcontext, null );
+            var controller_sut = new ProductsController( null, productsRepositoryMock.Object, null );
 
-            var result = await controller.GetByIdAsync(_productsSeed.Count, new CancellationToken() );
+            var result = await controller_sut.GetByIdAsync( _productsSeed.Count, new CancellationToken() );
 
             Assert.IsType<OkObjectResult>( result.Result );
 
@@ -76,46 +76,49 @@ namespace RetailApiTestProject {
         [Fact]
         public async Task GetById_ShouldReturnNotFoundObjectResult() {
 
-            var productsDbcontext = SetupInMemoryDbContext.GetProductsDbContext( nameof( this.GetById_ShouldReturnNotFoundObjectResult) );
-            productsDbcontext.SeedAppDbContext( _productsSeed );
+            var productsRepositoryMock = new Mock<IProductsRepository>();
+            productsRepositoryMock.Setup( x => x.GetByIdAsync( It.IsAny<int>(), new CancellationToken() ) ).Returns(Task.FromResult( (Product)null ));
 
-            var controller = new ProductsController( null, productsDbcontext, null );
+            var controller_sut = new ProductsController( null, productsRepositoryMock.Object, null );
 
-            var result = await controller.GetByIdAsync( _productsSeed.Count+5, new CancellationToken() );
+            var result = await controller_sut.GetByIdAsync( 1, new CancellationToken() );
 
             Assert.IsType<NotFoundObjectResult>( result.Result );
 
         }
 
-        [Fact]
-        public async Task GetById_ShouldReturnCorrespondingProduct() {
+        [Theory]
+        [InlineData(1)]
+        [InlineData( 5 )]
+        [InlineData( 7 )]
+        public async Task GetById_ShouldReturnCorrespondingProduct(int id) {
 
-            var productsDbcontext = SetupInMemoryDbContext.GetProductsDbContext( nameof( this.GetById_ShouldReturnCorrespondingProduct ) );
-            productsDbcontext.SeedAppDbContext( _productsSeed );
+            var productsRepositoryMock = new Mock<IProductsRepository>();
+            productsRepositoryMock.Setup( x => x.GetByIdAsync(id, new CancellationToken() ) ).Returns( Task.FromResult( _productsSeed[id-1] ) );
 
-            var controller = new ProductsController( null, productsDbcontext,null );
+            var controller_sut = new ProductsController( null, productsRepositoryMock.Object, null );
 
-            var result = await controller.GetByIdAsync( _productsSeed.Count, new CancellationToken() );
+            var result = await controller_sut.GetByIdAsync( id, new CancellationToken() );
 
             Assert.IsType<OkObjectResult>( result.Result );
             Assert.NotNull( result.Result );
 
-            Product product=null;
-            if ( result.Result != null && result.Result is OkObjectResult ) {
-                product = (Product)( (ObjectResult)result.Result ).Value;
-                Assert.Equal( _productsSeed.Count, product.Id );
-            }
+            Product product = null;
+            product = (Product)( (ObjectResult)result.Result ).Value;
+            Assert.Equal( _productsSeed[id - 1].Id, product.Id );
+            
         }
 
         [Fact]
         public async Task UpdateDescription_ShouldReturnNotFoundObjectResult() {
 
-            var productsDbcontext = SetupInMemoryDbContext.GetProductsDbContext( nameof( this.UpdateDescription_ShouldReturnNotFoundObjectResult ) );
-            productsDbcontext.SeedAppDbContext( _productsSeed );
+            var productsRepositoryMock = new Mock<IProductsRepository>();
+            productsRepositoryMock.Setup( x => x.GetByIdAsync( It.IsAny<int>(), new CancellationToken() ) )
+                .Returns( Task.FromResult( (Product)null ) );
 
-            var controller = new ProductsController( null, productsDbcontext, null );
+            var controller_sut = new ProductsController( null, productsRepositoryMock.Object, null );
 
-            var result = await controller.UpdateDescriptionAsync( _productsSeed.Count +5, "test", new CancellationToken() );
+            var result = await controller_sut.UpdateDescriptionAsync(1, "test", new CancellationToken() );
 
             Assert.IsType<NotFoundObjectResult>( result.Result );
 
@@ -124,12 +127,14 @@ namespace RetailApiTestProject {
         [Fact]
         public async Task UpdateDescription_ShouldReturnOk() {
 
-            var productsDbcontext = SetupInMemoryDbContext.GetProductsDbContext( nameof( this.UpdateDescription_ShouldReturnOk ) );
-            productsDbcontext.SeedAppDbContext( _productsSeed );
+            var productsRepositoryMock = new Mock<IProductsRepository>();            
+            productsRepositoryMock.Setup( x => x.UpdateDescription( It.IsAny<int>(), It.IsAny<string>(), new CancellationToken() ) )
+                .Returns( Task.FromResult( ( _productsSeed.Last() ) ) );
 
-            var controller = new ProductsController( null, productsDbcontext , null);
+            var controller_sut = new ProductsController( null, productsRepositoryMock.Object, null );
+            
 
-            var result = await controller.UpdateDescriptionAsync( _productsSeed.Count , "test", new CancellationToken() );
+            var result = await controller_sut.UpdateDescriptionAsync( _productsSeed.Count, "test", new CancellationToken() );
 
             Assert.IsType<OkObjectResult>( result.Result );
 
@@ -147,50 +152,55 @@ namespace RetailApiTestProject {
 
             Assert.NotNull( lengthLimit );
 
-            var productsDbcontext = SetupInMemoryDbContext.GetProductsDbContext( nameof( this.UpdateDescription_ShouldReturnBadRequestObjectResult ) );
-            productsDbcontext.SeedAppDbContext( _productsSeed );
+            var productsRepositoryMock = new Mock<IProductsRepository>();            
+            productsRepositoryMock.Setup( x => x.UpdateDescription( It.IsAny<int>(), It.IsAny<string>(), new CancellationToken() ) )
+                .Throws( new DescriptionTooLongException() );
 
-            var controller = new ProductsController( null, productsDbcontext, null );
+            var controller_sut = new ProductsController( null, productsRepositoryMock.Object, null );
+            
 
-            var result = await controller.UpdateDescriptionAsync( _productsSeed.Count, new string('a',lengthLimit.Value+5), new CancellationToken() );
+            var result = await controller_sut.UpdateDescriptionAsync( _productsSeed.Count, "test", new CancellationToken() );
 
             Assert.IsType<BadRequestObjectResult>( result.Result );
 
         }
 
         [Fact]
-        public async Task UpdateDescription_ShouldUpdateDescriptionField() {
+        public async Task UpdateDescription_ShouldReturnUpdatedProduct() {
 
-            var productsDbcontext = SetupInMemoryDbContext.GetProductsDbContext( nameof( this.UpdateDescription_ShouldUpdateDescriptionField ) );
-            productsDbcontext.SeedAppDbContext( _productsSeed );
-
+            //Arrange
             var guid = Guid.NewGuid();
 
-            var controller = new ProductsController( null, productsDbcontext, null );
+            var productsRepositoryMock = new Mock<IProductsRepository>();
+            productsRepositoryMock.Setup( x => x.UpdateDescription( It.IsAny<int>(), It.IsAny<string>(), new CancellationToken() ) )
+                .Returns( Task.FromResult( new Product() { Description = guid.ToString() } ));
 
-            var result = await controller.UpdateDescriptionAsync( _productsSeed.Count, guid.ToString(), new CancellationToken() );
+            var controller_sut = new ProductsController( null, productsRepositoryMock.Object, null );
 
+            //act
+            var result = await controller_sut.UpdateDescriptionAsync( _productsSeed.Count, "test", new CancellationToken() );
 
+            //assert
             Assert.IsType<OkObjectResult>( result.Result );
-            Assert.NotNull( result.Result );
 
-            if ( result.Result != null && result.Result is OkObjectResult ) {
-                var product = await productsDbcontext.Products.FindAsync( _productsSeed.Count );
+            Product product = null;
+            product = (Product)( (ObjectResult)result.Result ).Value;
 
-                var returnedProduct = (Product)( (ObjectResult)result.Result ).Value;
-                Assert.Equal( product.Id, returnedProduct.Id );
-                Assert.Equal( product.Description, returnedProduct.Description );
-                Assert.Equal( guid.ToString(), returnedProduct.Description );
-            }
+            Assert.Equal( guid.ToString(), product.Description );
+
         }
+
+
+
 
         [Fact]
         public async Task GetAll20_ShouldReturnOkObject() {
 
             //Arrange
-            var productsDbcontext = SetupInMemoryDbContext.GetProductsDbContext( nameof( this.GetAll20_ShouldReturnOkObject ) );
-            productsDbcontext.SeedAppDbContext( _productsSeed );
-
+            var productsRepositoryMock = new Mock<IProductsRepository>();
+            productsRepositoryMock.Setup( x => x.GetAllPaginatedAsync( It.IsAny<int>(), It.IsAny<int>(), new CancellationToken() ) )
+                .Returns( Task.FromResult( new PaginatedResponseModel<Product>() ) );
+            
             var context = GetActionContextForPage( "/api/products" );
 
             var uriGeneratorMock = new Mock<IUriGenerator>();
@@ -205,14 +215,14 @@ namespace RetailApiTestProject {
             urlHelperMock.Setup( x => x.RouteUrl( It.IsAny<UrlRouteContext>() ) )
                 .Returns( "api/products" );
 
-            var ctx = new DefaultHttpContext();   
-            
-            var controller_sut = new ProductsController( null, productsDbcontext, uriGeneratorMock.Object );
+            var ctx = new DefaultHttpContext();
+
+            var controller_sut = new ProductsController( null, productsRepositoryMock.Object, uriGeneratorMock.Object );
             controller_sut.ControllerContext = new ControllerContext() { HttpContext = ctx };
             controller_sut.Url = urlHelperMock.Object;
 
             //Act
-            var response = await controller_sut.GetAllAsync20( new PaginationQuery() , new CancellationToken());
+            var response = await controller_sut.GetAllAsync20( new PaginationQuery(), new CancellationToken() );
 
             //Assert
             Assert.IsType<OkObjectResult>( response.Result );
@@ -223,8 +233,10 @@ namespace RetailApiTestProject {
         public async Task GetAll20_ShouldReturnNotFoundObjectResult() {
 
             //Arrange
-            var productsDbcontext = SetupInMemoryDbContext.GetProductsDbContext( nameof( this.GetAll20_ShouldReturnNotFoundObjectResult ) );
-            productsDbcontext.SeedAppDbContext( _productsSeed );
+            var productsRepositoryMock = new Mock<IProductsRepository>();
+            productsRepositoryMock.Setup( x => x.GetAllPaginatedAsync( It.IsAny<int>(), It.IsAny<int>(), new CancellationToken() ) )
+                .Throws( new PageOutOfRangeException() );
+
 
             var context = GetActionContextForPage( "/api/products" );
 
@@ -242,13 +254,13 @@ namespace RetailApiTestProject {
 
             var ctx = new DefaultHttpContext();
 
-            var controller_sut = new ProductsController( null, productsDbcontext, uriGeneratorMock.Object );
+            var controller_sut = new ProductsController( null, productsRepositoryMock.Object, uriGeneratorMock.Object );
             controller_sut.ControllerContext = new ControllerContext() { HttpContext = ctx };
             controller_sut.Url = urlHelperMock.Object;
 
 
             //Act
-            var response = await controller_sut.GetAllAsync20( new PaginationQuery(10,20), new CancellationToken() );
+            var response = await controller_sut.GetAllAsync20( new PaginationQuery( 10, 20 ), new CancellationToken() );
 
             //Assert
             Assert.IsType<NotFoundObjectResult>( response.Result );
@@ -259,8 +271,9 @@ namespace RetailApiTestProject {
         public async Task GetAll20_ShouldReturnBadRequestObjectResult() {
 
             //Arrange
-            var productsDbcontext = SetupInMemoryDbContext.GetProductsDbContext( nameof( this.GetAll20_ShouldReturnBadRequestObjectResult ) );
-            productsDbcontext.SeedAppDbContext( _productsSeed );
+            var productsRepositoryMock = new Mock<IProductsRepository>();
+            productsRepositoryMock.Setup( x => x.GetAllPaginatedAsync( It.IsAny<int>(), It.IsAny<int>(), new CancellationToken() ) )
+                .Returns( Task.FromResult( new PaginatedResponseModel<Product>() ) );
 
             var context = GetActionContextForPage( "/api/products" );
 
@@ -278,7 +291,7 @@ namespace RetailApiTestProject {
 
             var ctx = new DefaultHttpContext();
 
-            var controller_sut = new ProductsController( null, productsDbcontext, uriGeneratorMock.Object );
+            var controller_sut = new ProductsController( null, productsRepositoryMock.Object, uriGeneratorMock.Object );
             controller_sut.ControllerContext = new ControllerContext() { HttpContext = ctx };
             controller_sut.Url = urlHelperMock.Object;
 
