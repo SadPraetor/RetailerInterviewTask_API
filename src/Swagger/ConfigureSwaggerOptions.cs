@@ -25,7 +25,7 @@ namespace RetailerInterviewAPITask.Swagger {
 
         private static OpenApiInfo CreateInfoForApiVersion( ApiVersionDescription description ) {
             var info = new OpenApiInfo() {
-                Title = "Sample API",
+                Title = "Products API",
                 Version = description.ApiVersion.ToString(),
             };
 
