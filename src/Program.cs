@@ -1,3 +1,4 @@
+using API.DevDataSeed;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
@@ -10,7 +11,15 @@ using System.Threading.Tasks;
 namespace RetailerInterviewAPITask {
     public class Program {
         public static void Main( string[] args ) {
-            CreateHostBuilder( args ).Build().Run();
+            var hostBuilder = CreateHostBuilder( args ).Build();
+
+            if ( Environment.GetEnvironmentVariable( "ASPNETCORE_ENVIRONMENT" ) == Environments.Development ) {
+                hostBuilder
+                    .MigrateDatabase()
+                    .SeedDatabaseIfEmpty(300);
+            };
+
+            hostBuilder.Run();
         }
 
         public static IHostBuilder CreateHostBuilder( string[] args ) =>
