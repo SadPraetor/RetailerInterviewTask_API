@@ -6,6 +6,6 @@ using System.Threading.Tasks;
 
 namespace API.Services {
     public interface IUriGenerator {
-        Dictionary<string, string> GeneratePaginationLinks<T>( PaginatedResponseModel<T> paginationResponseModel, string path );
+        Dictionary<string, string> GeneratePaginationLinks<T>( IPaginatedResponseModel<T> paginationResponseModel, string path );
     }
 }

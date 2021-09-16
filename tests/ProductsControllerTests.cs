@@ -2,7 +2,12 @@ using API.DataAccess;
 using API.DevDataSeed;
 using API.Models;
 using API.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Abstractions;
+using Microsoft.AspNetCore.Mvc.Routing;
+using Microsoft.AspNetCore.Routing;
+using Moq;
 using RetailerInterviewAPITask.Controllers;
 using System;
 using System.Collections.Generic;
@@ -162,6 +167,55 @@ namespace RetailApiTestProject {
             }
         }
 
-        
+        [Fact]
+        public async Task GetAll20_ShouldReturnOkObject() {
+
+            var productsDbcontext = SetupInMemoryDbContext.GetProductsDbContext( nameof( this.GetAll20_ShouldReturnOkObject ) );
+            productsDbcontext.SeedAppDbContext( _productsSeed );
+
+            var context = GetActionContextForPage( "/api/products" );
+
+            var uriGeneratorMock = new Mock<IUriGenerator>();
+            uriGeneratorMock.Setup( x =>
+             x.GeneratePaginationLinks( It.IsAny<PaginatedResponseModel<Product>>(), It.IsAny<string>() ) )
+            .Returns( new Dictionary<string, string> { { "Next", "xyz" } } );
+
+            var urlHelperMock = new Mock<IUrlHelper>();
+            urlHelperMock.SetupGet( h => h.ActionContext )
+                .Returns( context );
+
+            urlHelperMock.Setup( h => h.RouteUrl( It.IsAny<UrlRouteContext>() ) )
+                .Returns( "api/products" );
+
+            var ctx = new DefaultHttpContext();            
+            var controller = new ProductsController( null, productsDbcontext, uriGeneratorMock.Object );
+            controller.ControllerContext = new ControllerContext() { HttpContext = ctx };
+            controller.Url = urlHelperMock.Object;
+
+            var response = await controller.GetAllAsync20( new PaginationQuery() , new CancellationToken());
+
+            Assert.IsType<OkObjectResult>( response.Result );
+
+        }
+
+
+        private static ActionContext GetActionContextForPage( string page ) {
+            return new ActionContext() {
+                ActionDescriptor = new ActionDescriptor() {
+                    RouteValues = new Dictionary<string, string>
+                    {
+                { "page", page },
+            }
+                },
+                RouteData = new RouteData() {
+                    Values =
+                    {
+                [ "page" ] = page
+            }
+                }
+            };
+        }
+
+
     }
 }

@@ -13,7 +13,7 @@ namespace API.Services {
             _baseUri = baseUri;
         }
 
-        public Dictionary<string, string> GeneratePaginationLinks<T> (PaginatedResponseModel<T> paginationResponseModel, string path ) {
+        public Dictionary<string, string> GeneratePaginationLinks<T> (IPaginatedResponseModel<T> paginationResponseModel, string path ) {
 
             var uri = new Uri( new Uri(_baseUri), path ).ToString();
 
