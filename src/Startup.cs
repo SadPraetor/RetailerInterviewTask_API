@@ -31,6 +31,8 @@ namespace RetailerInterviewAPITask {
                  options.UseSqlServer( Configuration.GetConnectionString( "ProductsDb" ) ) 
             );
 
+            services.AddTransient<IProductsRepository, DbProductsRepository>();
+
             services.AddControllers( options => options.InputFormatters.Insert( 0, new RawRequestBodyFormatter() ) );
                
 

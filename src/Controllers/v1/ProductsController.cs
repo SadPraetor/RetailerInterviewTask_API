@@ -26,7 +26,7 @@ namespace RetailerInterviewAPITask.Controllers {
         [Produces( "application/json" )]
         [ProducesResponseType( StatusCodes.Status200OK, Type = typeof( IEnumerable<Product> ) )]
         public async Task<IEnumerable<Product>> GetAllAsync( CancellationToken cancellationToken ) {
-            return await _productsDbContext.Products.AsNoTracking().ToListAsync( cancellationToken );
+            return await _productsRepository.GetAllAsync( cancellationToken );
         }
 
 
@@ -44,7 +44,7 @@ namespace RetailerInterviewAPITask.Controllers {
         [ProducesResponseType( StatusCodes.Status404NotFound, Type = typeof( ExceptionDto ) )]
         public async Task<ActionResult<Product>> GetByIdAsync(int id, CancellationToken cancellationToken ) {
 
-            var product =  await _productsDbContext.Products.FindAsync(new object[] { id }, cancellationToken );
+            var product =  await _productsRepository.GetByIdAsync( id , cancellationToken );
 
             if ( product == null )
                 return NotFound(new ExceptionDto ("NotFound","Requested product was not found"));
@@ -71,28 +71,17 @@ namespace RetailerInterviewAPITask.Controllers {
         [ProducesResponseType( StatusCodes.Status404NotFound, Type = typeof( ExceptionDto ) )]
         public async Task<ActionResult<Product>> UpdateDescriptionAsync( int id , [FromBody] string newDescription, CancellationToken cancellationToken ) {
 
-            var lengthLimit =  typeof( Product )
-                .GetProperty( nameof( Product.Description ) )
-                .GetCustomAttributes( typeof( StringLengthAttribute ), false )
-                .OfType<StringLengthAttribute>()
-                .FirstOrDefault()?
-                .MaximumLength ?? int.MaxValue;
-
-            if ( newDescription.Length>lengthLimit ) {
-                return BadRequest( new ExceptionDto( "DescriptionTooLong", $"Description is limited to {lengthLimit} characters" ) );
+            Product product = null;
+            try {
+                product = await _productsRepository.UpdateDescription( id, newDescription, cancellationToken );
             }
+            catch ( DescriptionTooLongException exception ) {
 
-            var product = await _productsDbContext.Products.FindAsync( new object[] { id }, cancellationToken );
+                return BadRequest( new ExceptionDto( exception ) );
+            }
 
             if ( product == null )
                 return NotFound( new ExceptionDto( "NotFound", "Requested product was not found" ) );
-
-            product.Description = newDescription;
-
-            
-
-            //TODO check for concurrency error?
-            await _productsDbContext.SaveChangesAsync();
 
             return Ok( product );
         }

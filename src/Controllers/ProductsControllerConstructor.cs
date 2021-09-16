@@ -21,16 +21,16 @@ namespace RetailerInterviewAPITask.Controllers {
         
 
         private readonly ILogger<ProductsController> _logger;
-        private readonly ProductsDbContext _productsDbContext;
+        private readonly IProductsRepository _productsRepository;
         private readonly IUriGenerator _uriGenerator;
 
         public ProductsController( 
             ILogger<ProductsController> logger,
-            ProductsDbContext productsDbContext,
+            IProductsRepository productsRepository,
             IUriGenerator uriGenerator) 
         {
             _logger = logger;
-            _productsDbContext = productsDbContext;
+            _productsRepository = productsRepository;
             _uriGenerator = uriGenerator;
         }
 

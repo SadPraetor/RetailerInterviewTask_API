@@ -35,27 +35,24 @@ namespace RetailerInterviewAPITask.Controllers {
 
                 var paginationFilter = new PaginationFilter( paginationQuery );
 
-                var paginatedModel =   await _productsDbContext
-                    .Products
-                    .AsNoTracking()
-                    .OrderBy(x=>x.Id)
-                    .PaginateAsync<Product>( paginationFilter.Page, paginationFilter.PageSize, cancellationToken ) ;
+                var paginatedModel = await _productsRepository.GetAllPaginatedAsync(
+                    paginationFilter.Page, paginationFilter.PageSize, cancellationToken );
 
                 var path = Url.RouteUrl( nameof( GetAllAsync20 ) );
 
-                paginatedModel.Links = _uriGenerator.GeneratePaginationLinks<Product>(paginatedModel, path );
+                paginatedModel.Links = _uriGenerator.GeneratePaginationLinks<Product>( paginatedModel, path );
 
-                return Ok(paginatedModel);
+                return Ok( paginatedModel );
 
             }
-            catch ( PageOutOfRangeException exception) {
+            catch ( PageOutOfRangeException exception ) {
                 return NotFound( new ExceptionDto( exception ) );
             }
-            catch ( FaultyPaginationQueryException exception ) {              
-                return BadRequest( new ExceptionDto(exception) );
+            catch ( FaultyPaginationQueryException exception ) {
+                return BadRequest( new ExceptionDto( exception ) );
             }
-            catch(Exception exception ) {                
-                return StatusCode( StatusCodes.Status500InternalServerError,new ExceptionDto(exception) );
+            catch ( Exception exception ) {
+                return StatusCode( StatusCodes.Status500InternalServerError, new ExceptionDto( exception ) );
             }
         }       
     }
