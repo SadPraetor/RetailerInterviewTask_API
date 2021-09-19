@@ -57,6 +57,8 @@ namespace RetailerInterviewAPITask {
             } 
             );
 
+            //to allow empty update string in the body to set description to null
+            services.AddOptions<MvcOptions>().Configure( o => o.AllowEmptyInputInBodyModelBinding = true );
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 

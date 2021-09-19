@@ -78,7 +78,8 @@ namespace RetailerInterviewAPITask.Controllers {
                 .FirstOrDefault()?
                 .MaximumLength ?? int.MaxValue;
 
-            if ( newDescription.Length>lengthLimit ) {
+            //if the payload is not null, we perform lengthLimit check
+            if ( !string.IsNullOrEmpty(newDescription) && newDescription.Length>lengthLimit ) {
                 return BadRequest( new ExceptionDto( "DescriptionTooLong", $"Description is limited to {lengthLimit} characters" ) );
             }
 
